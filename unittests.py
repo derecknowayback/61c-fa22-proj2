@@ -65,6 +65,22 @@ class TestRelu(unittest.TestCase):
         # generate the `assembly/TestRelu_test_simple.s` file and run it through venus
         t.execute()
 
+    def test_relu_big_num(self):
+        # load the test for relu.s
+        t = AssemblyTest(self, "relu.s")
+        # create an array in the data section
+        array0 = t.array([102122012, -2999999, 30000, -4992821831, 5, -61203923, 7, -82222, 9])
+        # load address of `array0` into register a0
+        t.input_array("a0", array0)
+        # set a1 to the length of our array
+        t.input_scalar("a1", len(array0))
+        # call the `relu` function
+        t.call("relu")
+        # check that the array0 was changed appropriately
+        t.check_array(array0, [102122012, 0, 30000, 0, 5, 0, 7, 0, 9])
+        # generate the `assembly/TestRelu_test_simple.s` file and run it through venus
+        t.execute()    
+
     def test_relu_length_1(self):
         # load the test for relu.s
         t = AssemblyTest(self, "relu.s")
@@ -149,6 +165,24 @@ class TestDot(unittest.TestCase):
         t.call("dot")
         # check the return value
         t.check_scalar("a0", 285)
+        t.execute()
+
+    def test_dot_negative(self):
+        t = AssemblyTest(self, "dot.s")
+        # create arrays in the data section
+        arr0 = t.array([-1, -2, 3, -4, 5, 6, 7, 8, 9])
+        arr1 = t.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
+        # load array addresses into argument registers
+        t.input_array("a0", arr0)
+        t.input_array("a1", arr1)
+        # load array attributes into argument registers
+        t.input_scalar("a2", len(arr0))
+        t.input_scalar("a3", 1)
+        t.input_scalar("a4", 1)
+        # call the `dot` function
+        t.call("dot")
+        # check the return value
+        t.check_scalar("a0", 243)
         t.execute()
 
     def test_dot_stride(self):
